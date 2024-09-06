@@ -9,12 +9,19 @@ public class MatrizUsuario {
     }
 
     // metodo que preguntara la dimension de la matriz
-    public static int solicitarDimension(Scanner scanner, String dimension) {
-        int dimensionValor;
+    public static int solicitarDimension(Scanner scanner, String Dimension) {
+        int dimension;
         do {
-            dimensionValor = leerDimension(scanner, dimension); // Lee el valor de la dimension
-        } while (!validarDimension(dimensionValor)); // Lo valida
-        return dimensionValor;
+            System.out.println("Ingrese el número de " + Dimension + ": ");
+            // Agrega la siguiente línea para limpiar el buffer si hubo un nextInt antes
+            while (!scanner.hasNextInt()) {
+                System.out.println("Entrada no válida. Por favor, ingrese un número entero.");
+                scanner.next();  // Descartar la entrada no válida
+            }
+            dimension = scanner.nextInt();
+            scanner.nextLine(); // Limpiar el salto de línea pendiente
+        } while (!validarDimension(dimension));
+        return dimension;
     }
 
     //Lee la dimension y llama al metodo que valida dimensiones
@@ -36,7 +43,7 @@ public class MatrizUsuario {
             return false;
         }
     }
-
+    // Crea la matriz con las dimensiones dadas por el usuario
     public static int[][] iniciarMatriz(Scanner scanner) {
         System.out.println("Creación de la matriz:");
 
@@ -44,15 +51,21 @@ public class MatrizUsuario {
         int columnas = solicitarDimension(scanner, "columnas");
 
         int[][] matriz = new int[filas][columnas];
-        for (int i = 0; i < filas; i++) {
-            for (int j = 0; j < columnas; j++) {
-                matriz[i][j] = (int) (Math.random() * 9);  // Llenar con valores aleatorios del 0 al 9
-            }
-        }
-
         System.out.println("Matriz de " + filas + "x" + columnas + " creada exitosamente.");
         return matriz;
     }
+    //llena la matriz con valores aleatorios
+    public static void llenarMatriz(int[][] matriz) {
+        int filas = matriz.length;
+        int columnas = matriz[0].length;
+
+        for (int i = 0; i < filas; i++) {
+            for (int j = 0; j < columnas; j++) {
+                matriz[i][j] = (int) (Math.random() * 9);  // Llenar con valores aleatorios entre 0 y 9
+            }
+        }
+    }
+
     public static void mostrarMatriz(int[][] matriz) {
         System.out.println("Matriz de ventas:");
         for (int[] fila : matriz) {
@@ -65,17 +78,16 @@ public class MatrizUsuario {
 
     public static void iniciarMenu() {
         Scanner scanner = new Scanner(System.in);
+        int[][] matriz = null;
 
-        int filas = solicitarDimension(scanner, "filas");
-        int columnas = solicitarDimension(scanner, "columnas");
-        int[][] matriz = iniciarMatriz(scanner);
 
         boolean salir = false;
+
         while (!salir) {
             mostrarMenu();
             int opcion = leerOpcion(scanner);
 
-            salir = ejecutarOpcion(opcion, matriz);
+            salir = ejecutarOpcion(opcion,scanner, matriz);
         }
         scanner.close();
     }
@@ -83,12 +95,21 @@ public class MatrizUsuario {
     public static int leerOpcion(Scanner scanner) {
         return scanner.nextInt();
     }
+
     //ejecuta la opcion elegida por el usuario
-    public static boolean ejecutarOpcion(int opcion, int[][] matriz) {
+    public static boolean ejecutarOpcion(int opcion, Scanner scanner, int[][] matriz) {
         switch (opcion) {
             case 1:
-                mostrarMatriz(matriz);
+                matriz = iniciarMatriz(scanner);
                 break;
+            case 2:
+                if (matriz != null) {
+                    llenarMatriz(matriz);
+                } else {
+                    System.out.println("Primero debe crear la matriz (opción 1).");
+                }
+                break;
+
             case 5:
                 return true; // Salir del programa
             default:
