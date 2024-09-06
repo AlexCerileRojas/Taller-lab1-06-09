@@ -2,12 +2,12 @@ import java.util.Scanner;
 
 public class MatrizUsuario {
 
-    // metodo main, solo llama al menu
+    // Metodo main que llama al menu
     public static void main(String[] args) {
         iniciarMenu();
     }
 
-    // Pregunta dimension al usuario
+    // Solicita las dimensiones al usuario
     public static int solicitarDimension(Scanner scanner, String tipoDimension) {
         int dimension;
         do {
@@ -16,7 +16,7 @@ public class MatrizUsuario {
         return dimension;
     }
 
-    // Lee y llama al metodo para validar la dimension
+    // Lee la dimensión y llama al metodo que valida dimensiones
     public static int leerDimension(Scanner scanner, String tipoDimension) {
         int dimension;
         System.out.println("Ingrese el número de " + tipoDimension + ": ");
@@ -25,7 +25,7 @@ public class MatrizUsuario {
             scanner.next(); // Descartar la entrada no válida
         }
         dimension = scanner.nextInt();
-        scanner.nextLine(); // Limpiar el salto de línea pendiente
+        scanner.nextLine(); // Limpia el salto de línea
         return dimension;
     }
 
@@ -44,8 +44,6 @@ public class MatrizUsuario {
         System.out.println("Creación de la matriz:");
         int filas = solicitarDimension(scanner, "filas");
         int columnas = solicitarDimension(scanner, "columnas");
-
-        System.out.println("Dimensiones ingresadas: filas = " + filas + ", columnas = " + columnas);
 
         int[][] matriz = new int[filas][columnas];
         System.out.println("Matriz de " + filas + "x" + columnas + " creada exitosamente.");
@@ -77,6 +75,8 @@ public class MatrizUsuario {
             System.out.println("Índice de fila no válido.");
         }
     }
+
+    // Verifica si la matriz es de tipo cero
     public static boolean matrizCero(int[][] matriz) {
         int totalElementos = matriz.length * matriz[0].length;
         int contadorCeros = 0;
@@ -88,29 +88,25 @@ public class MatrizUsuario {
                 }
             }
         }
+
+        // Verificar si más del 50% de los elementos son cero (definicion matriz cero)
         return contadorCeros > (totalElementos / 2);
     }
-    //metodo usado en el main para llamar al menu, asociado con leerOpcion, ejecutar opcion, mostrar menu
+
     public static void iniciarMenu() {
         Scanner scanner = new Scanner(System.in);
         int[][] matriz = null;
         boolean salir = false;
-        int fila = -1;
 
         while (!salir) {
             mostrarMenu();
             int opcion = leerOpcion(scanner);
 
-            if (opcion == 3 && matriz != null) {
-                System.out.println("Ingrese el índice de la fila que desea mostrar:");
-                fila = scanner.nextInt();
-                scanner.nextLine();
-            }
 
-            matriz = ejecutarOpcion(opcion, scanner, matriz, fila);
-
-            if (opcion == 5) {
-                salir = true;
+            if (opcion == 1) {
+                matriz = iniciarMatriz(scanner);
+            } else {
+                salir = ejecutarOpcion(opcion, scanner, matriz);
             }
         }
         scanner.close();
@@ -122,11 +118,8 @@ public class MatrizUsuario {
     }
 
     // Ejecuta la opción elegida por el usuario
-    public static int[][] ejecutarOpcion(int opcion, Scanner scanner, int[][] matriz, int fila) {
+    public static boolean ejecutarOpcion(int opcion, Scanner scanner, int[][] matriz) {
         switch (opcion) {
-            case 1:
-                matriz = iniciarMatriz(scanner);
-                break;
             case 2:
                 if (matriz != null) {
                     llenarMatriz(matriz);
@@ -136,21 +129,32 @@ public class MatrizUsuario {
                 break;
             case 3:
                 if (matriz != null) {
+                    System.out.println("Ingrese el índice de la fila que desea mostrar:");
+                    int fila = scanner.nextInt();
+                    scanner.nextLine();
                     mostrarFila(matriz, fila);
                 } else {
                     System.out.println("Primero debe crear la matriz (opción 1).");
                 }
                 break;
             case 4:
-                matrizCero(matriz);
+                if (matriz != null) {
+                    boolean esMatrizCero = matrizCero(matriz);
+                    if (esMatrizCero) {
+                        System.out.println("La matriz es de tipo cero.");
+                    } else {
+                        System.out.println("La matriz no es de tipo cero.");
+                    }
+                } else {
+                    System.out.println("Primero debe crear la matriz (opción 1).");
+                }
                 break;
-
             case 5:
-                return null;
+                return true;
             default:
                 System.out.println("Opción no válida, inténtelo de nuevo.");
         }
-        return matriz;
+        return false;
     }
 
     public static void mostrarMenu() {
@@ -158,8 +162,8 @@ public class MatrizUsuario {
         System.out.println("1. Crear matriz");
         System.out.println("2. Llenar matriz");
         System.out.println("3. Mostrar fila");
-        System.out.println("4. Mostrar si es matriz cero");
-        System.out.println("5. Salir del menú ");
+        System.out.println("4. Verificar si es matriz cero");
+        System.out.println("5. Salir");
         System.out.println("========================");
     }
 }
